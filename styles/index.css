@@ -1,0 +1,6 @@
+/* Make slide backgrounds always cover the canvas */
+.slidev-layout {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
