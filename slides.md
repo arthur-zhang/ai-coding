@@ -22,6 +22,8 @@ transition: slide-left
 mdc: true
 # duration of the presentation
 duration: 35min
+aspectRatio: 21/9
+colorSchema: light
 ---
 
 # AI Coding 的思考

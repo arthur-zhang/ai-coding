@@ -122,6 +122,16 @@
     *   **定位**: "企业级单体仓库引擎"。
     *   **优势**: 百万行代码秒级索引, 深度静态分析。
 
+### 4.2 TUI 复兴：极客与 Agent 的共同选择 (The TUI Renaissance)
+*   **为什么是 TUI? (Why TUI?)**:
+    *   **Speed & Flow**: 键鼠切换是心流杀手。全键盘操作 (Keyboard-centric) 匹配开发者的思考速度。
+    *   **Low Latency**: 相比 Electron 的臃肿，TUI (Rust/Go编写) 拥有毫秒级响应。
+    *   **LLM Native**: 文本流 (Text Stream) 是 LLM 的母语。Agent 解析纯文本界面的准确率远高于 GUI (Vision)。
+*   **现代 TUI 革命**:
+    *   不再是黑白枯燥的界面。
+    *   **Tech Stack**: Bubble Tea (Go), Ratatui (Rust), Ink (React).
+    *   **Aesthetics**: 极简主义、高对比度、信息密度适中，符合 "Hacker Aesthetic"。
+
 ### 4.3 极客配置参考 (Pro Configuration)
 *   **Core**: Claude Code (Max会员, 深度调研).
 *   **Editor**: Cursor (日常 Tab 补全) + Warp (AI 增强终端).
@@ -130,6 +140,16 @@
     *   `Kiro-workflow`: 专门执行 Spec 模式.
     *   `UI-Designer`: 独立负责前端组件生成.
 *   **Slash Commands**: `/think` (深度思考), `/review` (代码评审), `/commit` (自动提交).
+
+### 4.4 为什么必须精通 Claude Code? (Why Master Claude Code?)
+*   **Agentic Native 的标杆 (The Benchmark)**:
+    *   它代表了当前 AI Coding 的最高水位。学会使用它，你就理解了什么是真正的 "Agentic Workflow" (ReAct Loop)。
+    *   **区别于 Copilot**: Copilot 是"补全"，Claude Code 是"代理执行"。它能自主跑测试、修 Bug，直到任务完成。
+*   **更接近模型本质 (Closer to the Metal)**:
+    *   **Prompt Engineering 训练场**: 你能直观看到模型如何拆解任务、如何使用工具。这是提升你 "AI 语感" 的最佳途径。
+    *   **成本敏感度**: 它会告诉你每一步花了多少钱。这能培养你在未来管理 AI 团队时的"算力财务观"。
+*   **复杂任务的唯一解**:
+    *   对于跨几十个文件的重构或深度 Bug 排查，IDE 的 Chat 窗口往往无法承载。Claude Code 在终端中可以持续运行半小时，像一个真正的同事一样去解决困难问题。
 
 ---
 
