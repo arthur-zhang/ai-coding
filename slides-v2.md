@@ -73,33 +73,67 @@
 ## 3. 核心方法论：规范驱动开发 (Spec-Driven Development, SDD)
 *解决 "Context Drift" (上下文漂移) 和 "Vibe Coding" (凭感觉写) 的核心方案.*
 
-### 3.1 什么是 SDD?
-*   **核心理念**: **Spec (文档) 是 Source of Truth，Code 只是产物。**
-*   **Vibe 与 Spec 的辩证关系**:
-    *   **误区**: 认为 Vibe (随性) 与 Spec (严谨) 对立。
-    *   **真相**: Vibe Coding 不是代码混沌，而是人机高效协同的心流。Spec 是约束 AI "天马行空" 的锚点，让 Vibe 始终朝着目标发力。
-*   **SDD Workflow**:
-    1.  **Specify**: 编写 `feature-spec.md` (OAuth2 流程, JWT 签名, 错误码).
-    2.  **Plan**: Agent 基于 Spec 生成架构设计.
-    3.  **Implement**: Agent 读取 Spec 生成代码.
-    4.  **Verify**: Agent 读取 Spec 生成测试用例 (TDD).
-*   **本质**: Spec 是低熵的中间表示 (IR)，用于"锚定" AI 的生成过程，实现概率塌缩。
+### 3.1 需求澄清：对抗熵增的第一道防线 (Requirement Clarification)
+*   **Why it matters? (Garbage In, Garbage Out)**:
+    *   **概率陷阱**: 模糊的需求是 AI 幻觉的温床。AI 是概率模型，如果意图 (Intent) 不清晰，它会用“最大概率”的平庸方案填充空白，导致 "Vibe Coding"（凭感觉写）。
+    *   **错误成本杠杆**: 在 Prompt 阶段澄清需求的成本是几美分 (Tokens)；在代码实现后修复意图偏差的成本是几小时 (Human Time)。
+*   **结合 Claude Code "Plan Mode"**:
+    *   **机制**: Claude Code 的 `/plan` 模式强制执行 "Thinking before Coding"。它不直接执行，而是先生成 Step-by-Step 的计划。
+    *   **价值**: 这是一个**双向对齐 (Bi-directional Alignment)** 过程。AI 充当 "Product Owner" 挑战你的需求（e.g., "边界情况怎么处理？"），人类作为 "Architect" 确认范围。
+*   **SDD 中的位置**:
+    *   **Pre-Spec Phase**: 需求澄清是撰写 `feature-spec.md` 的前置动作。只有经过 Plan 模式拷问过的需求，才配写入 Spec。
+    *   **熵减过程**: 将 "User Vibe" (高熵、模糊) 转化为 "Spec/Plan" (低熵、确定性) 的关键转换层。
 
-### 3.2 Kiro (AWS): Agentic IDE 的 SDD 实践
+### 3.2 什么是 SDD? (What is SDD?)
+*   **核心理念 (Core Philosophy)**:
+    *   **Spec is the Source of Truth**: 代码只是 Spec 的一种"编译产物"。如果代码和 Spec 不一致，**永远修改 Spec**，而不是手动 Patch 代码。
+    *   **Doc-driven-coding**: 以前文档是"事后补救" (Afterthought)，现在文档是"事前指令" (Prompt)。
+*   **SDD Workflow (Standard Protocol)**:
+    1.  **Phase 1: Specify (定义)**:
+        *   Human: 创建/更新 `docs/feature-spec.md`。
+        *   Content: 定义 API 接口、数据结构 (JSON/SQL)、状态机流转图。
+    2.  **Phase 2: Plan (规划)**:
+        *   Agent: 读取 Spec，输出 `implementation-plan.md`。
+        *   Action: 确认涉及的文件变更列表，防止"蝴蝶效应"破坏现有逻辑。
+    3.  **Phase 3: Implement (实现)**:
+        *   Agent: 执行编码，严格遵循 Spec 中的命名与逻辑。
+        *   Command: `Write code based on feature-spec.md, strictly following interfaces.`
+    4.  **Phase 4: Verify (验证)**:
+        *   Agent: 根据 Spec 生成测试用例 (`test_feature.py`) 并运行。
+        *   Loop: 失败 → 修正代码 → 再失败 → **修正 Spec (如果 Spec 有漏洞)**。
+
+### 3.3 Spec 编写黄金法则 (Golden Rules of Spec Writing)
+*   **Rule 1: 原子化更新 (Atomic Updates)**: 不要试图一次性写完整个系统。一个 Spec 只描述一个 Feature（如 "User Login"），完成后归档或合并。
+*   **Rule 2: 伪代码即正义 (Pseudo-code is King)**: 自然语言容易歧义。用 Python/TypeScript Interface 描述数据结构，用 Mermaid 描述流程。
+*   **Rule 3: 视觉辅助 (Visuals > Text)**: 复杂的逻辑（如支付状态机）必须画图。Claude/GPT-4o 对 Mermaid/ASCII Art 的理解力远超长文本。
+*   **Rule 4: 包含"非功能需求"**: 显式定义性能要求 (Latency < 100ms)、错误处理策略 (Retry logic) 和日志规范。
+
+### 3.4 SDD 工具链与生态 (The SDD Ecosystem)
+*   **Spec Kit (by GitHub)**: "The Standardized Workflow"
+    *   **定位**: 官方定义的标准化 SDD 流程工具 (CLI)。
+    *   **核心**: 强制执行 4 阶段门禁 (Specify → Plan → Task → Implement)。
+    *   **优势**: 提供了标准化的 Prompt 模板，不仅适用于 Copilot，也适配 Claude Code 和 Gemini。
+*   **OpenSpec**: "The Lightweight Protocol"
+    *   **定位**: 极简主义的 Markdown 协议。
+    *   **核心**: **"Agreement before Coding"**。强调在写代码前，人类与 AI 必须在 `.openspec/` 目录下达成共识。
+    *   **场景**: 特别适合 **Brownfield (老项目维护)**。它通过 Change Folders 管理变更，避免了破坏现有代码的"屎山"风险。
+*   **选型建议**: 新项目开荒用 Spec Kit (结构严谨)；老项目迭代用 OpenSpec (轻量灵活)。
+
+### 3.5 Kiro (AWS): Agentic IDE 的 SDD 实践
 *   **Specs**: 自动将自然语言需求转化为结构化的 User Stories 和技术设计.
 *   **Hooks**: 事件驱动自动化 (e.g., 代码变更 → 自动更新测试/文档).
 *   **Steering**: 通过 Markdown 定义项目"宪法"，注入 System Prompt。
 
-### 3.4 直观对比：SDD vs Vibe (Visualizing the Difference)
+### 3.6 直观对比：SDD vs Vibe (Visualizing the Difference)
 *   **Left (Vibe Coding)**:
-    *   **Input**: Prompt "写个贪吃蛇".
-    *   **Output**: 单个 500 行的 `main.py`，结构混乱，难以扩展。
-    *   **Entropy**: High (不可控).
+    *   **Input**: Prompt "帮我写个贪吃蛇，要好玩的".
+    *   **Output**: 单个 800 行的 `god_class.py`，变量名 `a`, `b`, `tmp`，逻辑耦合严重，想改颜色会导致游戏崩溃。
+    *   **Result**: "Demo 此时能跑，明天必挂"。
 *   **Right (SDD)**:
-    *   **Input**: `snake_spec.md` (定义 Grid, Food, Snake 接口).
-    *   **Output**: 模块化代码 (Models, Views, Controllers)，包含单测。
-    *   **Entropy**: Low (确定性).
-*   **结论**: Spec 是降低系统熵值的唯一手段。
+    *   **Input**: `snake_spec.md` (定义 Grid 系统, Snake 类接口, GameLoop 状态机).
+    *   **Output**: 模块化架构 (`GameEngine`, `Renderer`, `InputHandler`)，配套 20 个单元测试，代码注释引用 Spec 章节。
+    *   **Result**: "工程化交付，可维护，可扩展"。
+*   **结论**: Spec 是将 AI 的"随机性创造"转化为"工程化产出"的唯一桥梁。
 
 ---
 
@@ -267,7 +301,7 @@
 
 ---
 
-## 9. 总结与展望 (Conclusion)
+### 9. 总结与展望 (Conclusion)
 
 1.  **掌握新语言**: Prompt/Context Engineering 是必修课。
 2.  **拥抱 SDD**: Spec 驱动，文档即源码。
@@ -277,7 +311,34 @@
 
 ---
 
-### 10. 行业暴论 (Hot Takes)
+## 10. 古法编程 vs AI Coding: 破除刻板印象 (Breaking Stereotypes)
+*当我们谈论 AI Coding 时，我们在谈论什么？*
+
+### 10.1 关于"灵魂"的争论 (The "Soul" of Coding)
+*   **Stereotype**: "AI 写代码没有灵魂，是拼凑的缝合怪。"
+*   **Reality**: 所谓的"灵魂"往往是不可维护的个人癖好 (Idiosyncrasies)。AI 生成的代码 (经过 `.cursorrules` 和 Spec 约束) 往往更符合社区标准、注释更全、更具可读性。
+*   **Analogy**: 就像"手工打造的家具" vs "宜家工业化生产"。前者有"灵魂"但昂贵且难以标准化复用；后者才是现代软件工程规模化的基础。
+
+### 10.2 关于"作弊"的迷思 (The "Cheating" Myth)
+*   **Stereotype**: "用 AI 写代码是作弊，会让你变傻，丧失基本功。"
+*   **Reality**: 工程师的核心能力是 **Problem Solving** (解决问题)，而不是 Syntax Memorizing (背诵语法)。
+*   **Evolution**: 汇编语言 -> C 语言 -> Python -> AI Coding。历史证明，每一层抽象诞生时都曾被守旧者视为"偷懒"，但每一层抽象都释放了人类更大的创造力去解决更复杂的问题。
+
+### 10.3 关于"不可维护"的恐惧 (The "Maintainability" Fear)
+*   **Stereotype**: "AI 生成的代码是屎山，迟早要重写。"
+*   **Reality**: **Vibe Coding** (凭感觉让 AI 盲写) 确实会产生屎山。但 **SDD (Spec-Driven)** 模式下，AI 产出的代码往往比疲惫的人类手写的更模块化、解耦更彻底。
+*   **Key**: 只有当你放弃 **Review** (审查) 和 **Architect** (架构) 的权责时，AI 才会制造灾难。
+
+### 10.4 专家的悖论 (The "Expertise" Paradox)
+*   **Stereotype**: "只有菜鸟 (Junior) 才用 AI，大神都用 Vim 手写。"
+*   **Reality**: 越是资深工程师 (Senior)，使用 AI 的杠杆率越高 (10x vs 1.5x)。
+    *   Senior 知道 *What to ask* (精准意图) 和 *How to judge* (快速纠错)。
+    *   Junior 容易被 AI 的幻觉带偏，陷入 "Debug Hell"。
+    *   **结论**: AI 是高手的"外骨骼"，是新手的"轮椅" (如果过度依赖)。
+
+---
+
+### 11. 行业暴论 (Hot Takes)
 
 #### Category 1: 架构与资产 (Architecture & Assets)
 1.  **代码资产贬值**: 源码是中间产物，**Spec (意图)** 和 **Test (验证)** 才是核心资产。
@@ -294,7 +355,7 @@
 
 ---
 
-## 11. Action Plan: 周一回去做什么
+## 12. Action Plan: 周一回去做什么
 
 ### Week 1: 建立基础设施
 *   [ ] **资产化 Prompt**: 创建 `.cursorrules` 和 `tech-stack.md`。
